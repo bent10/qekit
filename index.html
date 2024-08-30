@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QeKit</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <div class="container py-5">
+      <div class="d-flex gap-3">
+        <button class="btn btn-dark">Dark</button>
+        <button class="btn btn-light">Light</button>
+      </div>
+    </div>
+
+    <!-- <script src="./dist/index.umd.js"></script> -->
+    <script type="module">
+      import qe from "./src/index.ts"
+
+      const $ = qe(".btn")
+
+      $.addClass("foo")
+      console.log('hasClass("foo"):', $.hasClass("foo"))
+
+      $.setAttribute("data-id", "123")
+      console.log("data-id:", $.getAttribute("data-id"))
+
+      $.addClass("active").on("click", e => {
+        e.currentTarget.classList.toggle("active")
+        console.log(e.currentTarget)
+      })
+    </script>
+  </body>
+</html>

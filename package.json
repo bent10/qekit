@@ -1,0 +1,58 @@
+{
+  "name": "qekit",
+  "description": "A lightweight and chainable library for easy DOM manipulation in modern browsers",
+  "version": "0.0.0-development",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Beni Arisandi (https://stilearning.com)",
+  "repository": "https://github.com/bent10/qekit",
+  "bugs": "https://github.com/bent10/qekit/issues",
+  "license": "MIT",
+  "keywords": [
+    "dom",
+    "element",
+    "query",
+    "query-selector"
+  ],
+  "type": "module",
+  "browser": "dist/index.umd.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "readme.md",
+    "license"
+  ],
+  "scripts": {
+    "start": "vite",
+    "dev": "vite build --watch",
+    "build": "vite build && npm run types",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "types": "tsc -d --emitDeclarationOnly --outDir ./dist",
+    "lint": "tsc --noEmit && eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.5.0",
+    "doogu": "4.1.0",
+    "jsdom": "^25.0.0",
+    "vite-plugin-resolve-umd-format": "1.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "prettier": "doogu/prettier.config.js",
+  "release": {
+    "extends": "doogu/release.config.js"
+  }
+}
