@@ -39,13 +39,37 @@ Alternatively, you can also include this module directly in your HTML file from 
     <script src="https://cdn.jsdelivr.net/npm/qekit/dist/index.umd.js"></script>
     <script>
       // selects all elements with the class "foo"
-      const $ = qe('.foo')
+      const $ = qe('.foo') // qe('.foo', '.container')
 
       // rest of examples...
     </script>
   </body>
 </html>
 ```
+
+### Contextual selection
+
+Target elements within a specific container or DOM subtree:
+
+- **HTMLElement:**
+
+  ```js
+  const container = document.querySelector('#container')
+  const items = qe('.item', container)
+  ```
+
+- **QeKitInstance:**
+
+  ```js
+  const container = qe('#container')
+  const items = qe('.item', container)
+  ```
+
+- **CSS selector string:**
+
+  ```js
+  const items = qe('.item', '#container')
+  ```
 
 ### Class manipulation
 

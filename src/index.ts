@@ -25,9 +25,32 @@ class QeKit {
    * Creates a new QeKit instance.
    *
    * @param selectors - The CSS selector string to select elements.
+   * @param parent - The parent element or CSS selector string within which to search for the
+   *   elements. If not provided, the selector will be applied to the entire
+   *   document.
    */
-  constructor(selectors: string) {
-    this.elements = Array.from(document.querySelectorAll(selectors))
+  constructor(
+    selectors: string,
+    parent: Element | Document | string | QeKitInstance | null = document
+  ) {
+    let parentElement: Element | Document | null
+    if (typeof parent === 'string') {
+      parentElement = document.querySelector(parent)
+    } else if (parent instanceof QeKit) {
+      if (parent.elements.length > 0) {
+        parentElement = parent.elements[0]
+      } else {
+        parentElement = document
+      }
+    } else {
+      parentElement = parent
+    }
+
+    if (parentElement === null) {
+      parentElement = document
+    }
+
+    this.elements = Array.from(parentElement.querySelectorAll(selectors))
   }
 
   /**
@@ -184,8 +207,15 @@ export type QeKitInstance = QeKit & NativeElementMethods
  * Selects DOM elements using a CSS selector and returns a QeKit instance.
  *
  * @param selectors - The CSS selector string to select elements.
+ *
+ * @param parent - The parent element or CSS selector string within which to search for the
+ *   elements. If not provided, the selector will be applied to the entire
+ *   document.
  * @returns A QeKit instance representing the selected elements.
  */
-export default function qe(selectors: string) {
-  return new QeKit(selectors) as QeKitInstance
+export default function qe(
+  selectors: string,
+  parent: Element | Document | string | QeKitInstance | null = document
+) {
+  return new QeKit(selectors, parent) as QeKitInstance
 }

@@ -19,6 +19,56 @@ it('should select elements by CSS selector', () => {
   expect($.elements[1]).toHaveAttribute('id', 'bar')
 })
 
+it('should select elements within a specific parent', () => {
+  const $ = qe('.selector', document.querySelector('#container'))
+
+  expect($.elements.length).toBe(2)
+  expect($.elements[0].textContent).toBe('Foo')
+  expect($.elements[1].textContent).toBe('Bar')
+})
+
+it('should accept a QeKitInstance as the parent', () => {
+  const $container = qe('#container')
+  const $ = qe('.selector', $container)
+
+  expect($.elements.length).toBe(2)
+  expect($.elements[0].textContent).toBe('Foo')
+  expect($.elements[1].textContent).toBe('Bar')
+})
+
+it('should accept a CSS selector string as the parent', () => {
+  const $ = qe('.selector', '#container')
+
+  expect($.elements.length).toBe(2)
+  expect($.elements[0].textContent).toBe('Foo')
+  expect($.elements[1].textContent).toBe('Bar')
+})
+
+it('should handle non-existent elements gracefully', () => {
+  const $ = qe('.non-existent')
+  expect($.elements.length).toBe(0)
+
+  const clickHandler = vi.fn()
+  $.on('click', clickHandler).trigger('click')
+
+  expect(clickHandler).not.toHaveBeenCalled()
+})
+
+it('should handle non-existent parent gracefully', () => {
+  const $ = qe('.selector', '.nonexistent')
+
+  expect($.elements.length).toBe(2)
+  expect($.elements[0].textContent).toBe('Foo')
+  expect($.elements[1].textContent).toBe('Bar')
+})
+
+it('should handle multiple parents gracefully', () => {
+  const $ = qe('strong', qe('.selector'))
+
+  expect($.elements.length).toBe(1)
+  expect($.elements[0].textContent).toBe('Foo')
+})
+
 it('should add event listeners to elements', () => {
   const $ = qe('.selector')
   const clickHandler = vi.fn()
@@ -146,16 +196,6 @@ it('should allow method chaining', () => {
   const clickHandler = vi.fn()
 
   $.on('click', clickHandler).off('click', clickHandler).trigger('click')
-
-  expect(clickHandler).not.toHaveBeenCalled()
-})
-
-it('should handle non-existent elements gracefully', () => {
-  const $ = qe('.non-existent')
-  expect($.elements.length).toBe(0)
-
-  const clickHandler = vi.fn()
-  $.on('click', clickHandler).trigger('click')
 
   expect(clickHandler).not.toHaveBeenCalled()
 })
