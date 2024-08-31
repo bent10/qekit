@@ -38,6 +38,8 @@ Alternatively, you can also include this module directly in your HTML file from 
 
     <script src="https://cdn.jsdelivr.net/npm/qekit/dist/index.umd.js"></script>
     <script>
+      // import qe from 'qekit'
+
       // selects all elements with the class "foo"
       const $ = qe('.foo') // qe('.foo', '.container')
 
@@ -46,6 +48,14 @@ Alternatively, you can also include this module directly in your HTML file from 
   </body>
 </html>
 ```
+
+> [!NOTE]
+>
+> `qekit` allows you to select elements using different types of selectors:
+>
+> - **CSS Selector String**: `qe('.foo')`
+> - **HTMLElement**: `qe(document.querySelector('#foo'))`
+> - **NodeList/HTMLCollection**: `qe(document.querySelectorAll('.foo'))`
 
 ### Contextual selection
 
@@ -70,6 +80,10 @@ Target elements within a specific container or DOM subtree:
   ```js
   const items = qe('.item', '#container')
   ```
+
+> [!NOTE]
+>
+> The `parent` parameter is used only when the first argument (`selectors`) is a CSS selector string; otherwise, it is ignored.
 
 ### Class manipulation
 
@@ -117,7 +131,7 @@ $.elements.forEach(el => {
 
 ## API
 
-### `qe(selectors: string): QeKitInstance`
+### `qe(selectors: string | HTMLElement | NodeList | HTMLCollection | null, parent: Element | Document | string | QeKitInstance | null = document): QeKitInstance`
 
 Selects DOM elements based on the provided CSS selectors and returns a `QeKitInstance`.
 

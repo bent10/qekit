@@ -24,33 +24,41 @@ class QeKit {
   /**
    * Creates a new QeKit instance.
    *
-   * @param selectors - The CSS selector string to select elements.
+   * @param selectors - The CSS selector string, Element, NodeList, or HTMLCollection to select
+   *   elements.
    * @param parent - The parent element or CSS selector string within which to search for the
    *   elements. If not provided, the selector will be applied to the entire
    *   document.
    */
   constructor(
-    selectors: string,
+    selectors: string | Element | NodeList | HTMLCollection | null,
     parent: Element | Document | string | QeKitInstance | null = document
   ) {
-    let parentElement: Element | Document | null
-    if (typeof parent === 'string') {
-      parentElement = document.querySelector(parent)
-    } else if (parent instanceof QeKit) {
-      if (parent.elements.length > 0) {
-        parentElement = parent.elements[0]
+    if (typeof selectors === 'string') {
+      let parentElement: Element | Document | null
+      if (typeof parent === 'string') {
+        parentElement = document.querySelector(parent)
+      } else if (parent instanceof QeKit) {
+        parentElement = parent.elements[0] ?? document
       } else {
+        parentElement = parent
+      }
+
+      if (parentElement === null) {
         parentElement = document
       }
+
+      this.elements = Array.from(parentElement.querySelectorAll(selectors))
+    } else if (selectors instanceof Element) {
+      this.elements = [selectors as HTMLElement]
+    } else if (
+      selectors instanceof NodeList ||
+      selectors instanceof HTMLCollection
+    ) {
+      this.elements = Array.from(selectors) as HTMLElement[]
     } else {
-      parentElement = parent
+      this.elements = []
     }
-
-    if (parentElement === null) {
-      parentElement = document
-    }
-
-    this.elements = Array.from(parentElement.querySelectorAll(selectors))
   }
 
   /**
@@ -206,15 +214,15 @@ export type QeKitInstance = QeKit & NativeElementMethods
 /**
  * Selects DOM elements using a CSS selector and returns a QeKit instance.
  *
- * @param selectors - The CSS selector string to select elements.
- *
+ * @param selectors - The CSS selector string, Element, NodeList, or HTMLCollection to select
+ *   elements.
  * @param parent - The parent element or CSS selector string within which to search for the
  *   elements. If not provided, the selector will be applied to the entire
  *   document.
  * @returns A QeKit instance representing the selected elements.
  */
 export default function qe(
-  selectors: string,
+  selectors: string | Element | NodeList | HTMLCollection | null,
   parent: Element | Document | string | QeKitInstance | null = document
 ) {
   return new QeKit(selectors, parent) as QeKitInstance

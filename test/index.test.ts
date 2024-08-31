@@ -19,6 +19,29 @@ it('should select elements by CSS selector', () => {
   expect($.elements[1]).toHaveAttribute('id', 'bar')
 })
 
+it('should handle HTMLElement as selector', () => {
+  const fooElement = document.getElementById('foo')
+  const $ = qe(fooElement)
+  expect($.elements.length).toBe(1)
+  expect($.elements[0]).toBe(fooElement)
+})
+
+it('should handle NodeList as selector', () => {
+  const nodeList = document.querySelectorAll('.selector')
+  const $ = qe(nodeList)
+  expect($.elements.length).toBe(2)
+  expect($.elements[0]).toBe(nodeList[0])
+  expect($.elements[1]).toBe(nodeList[1])
+})
+
+it('should handle HTMLCollection as selector', () => {
+  const htmlCollection = document.getElementsByClassName('selector')
+  const $ = qe(htmlCollection)
+  expect($.elements.length).toBe(2)
+  expect($.elements[0]).toBe(htmlCollection[0])
+  expect($.elements[1]).toBe(htmlCollection[1])
+})
+
 it('should select elements within a specific parent', () => {
   const $ = qe('.selector', document.querySelector('#container'))
 
@@ -46,6 +69,16 @@ it('should accept a CSS selector string as the parent', () => {
 
 it('should handle non-existent elements gracefully', () => {
   const $ = qe('.non-existent')
+  expect($.elements.length).toBe(0)
+
+  const clickHandler = vi.fn()
+  $.on('click', clickHandler).trigger('click')
+
+  expect(clickHandler).not.toHaveBeenCalled()
+})
+
+it('should handle null selector gracefully', () => {
+  const $ = qe(null)
   expect($.elements.length).toBe(0)
 
   const clickHandler = vi.fn()
