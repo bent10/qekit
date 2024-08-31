@@ -41,9 +41,9 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/jest-dom": "6.5.0",
     "doogu": "4.1.0",
-    "jsdom": "^25.0.0",
+    "jsdom": "25.0.0",
     "vite-plugin-resolve-umd-format": "1.0.0"
   },
   "config": {
