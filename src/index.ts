@@ -116,6 +116,17 @@ class QeKit {
   }
 
   /**
+   * Gets an element at a specific index from the selected elements.
+   *
+   * @param index - The index of the element to get.
+   * @returns A new QeKit instance containing only the element at the specified index,
+   * or an empty QeKit instance if the index is out of bounds.
+   */
+  eq(index: number): QeKitInstance {
+    return new QeKit(this.elements[index]) as QeKitInstance
+  }
+
+  /**
    * Adds an event listener to the selected elements.
    *
    * @param type - The event type to listen for.

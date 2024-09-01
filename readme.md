@@ -134,6 +134,19 @@ Since `v1.3.0`
 $.map(element => parseInt(element.textContent, 10) * 2)
 ```
 
+### Element access by index
+
+Since `v1.3.0`
+
+`qekit` allows you to get specific elements from the selection by index using `eq(index)`:
+
+```js
+const secondItem = qe('.item').eq(1) // gets the second element
+if (secondItem) {
+  secondItem.classList.add('highlight')
+}
+```
+
 ### Chaining
 
 ```js
@@ -159,6 +172,7 @@ Selects DOM elements based on the provided CSS selectors and returns a `QeKitIns
 - **`on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): QeKitInstance`**: Adds an event listener to each selected element.
 - **`off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): QeKitInstance`**: Removes an event listener from each selected element.
 - **`trigger<T = any>(type: string | CustomEvent<T>, init?: CustomEventInit<T>): QeKitInstance`**: Triggers an event on each selected element, optionally passing an Event object (e.g., CustomEvent with data).
+- **`eq(index: number): QeKitInstance`**: Returns the element at the specified index or null if the index is out of bounds.
 - **Native Element Methods**: All native Element methods are available directly on the `QeKitInstance`.
 - **Array Methods**: All standard array methods (`map`, `filter`, `forEach`, `reduce`, `some`, `every`, `find`, `findIndex`) are chainable on the `QeKitInstance`.
 

@@ -267,6 +267,34 @@ describe('Class Manipulation', () => {
   })
 })
 
+describe('eq Method', () => {
+  it('should return a new QeKit instance with the element at the specified index', () => {
+    const $ = qe('.selector')
+    const $eq = $.eq(1)
+
+    expect($eq).toBeInstanceOf($.constructor)
+    expect($eq.elements.length).toBe(1)
+    expect($eq.elements[0]).toHaveAttribute('id', 'bar')
+  })
+
+  it('should return an empty QeKit instance if the index is out of bounds', () => {
+    const $ = qe('.selector')
+    const $eq = $.eq(3)
+
+    expect($eq).toBeInstanceOf($.constructor)
+    expect($eq.elements.length).toBe(0)
+  })
+
+  it('should allow chaining with other methods', () => {
+    const $ = qe('.selector')
+    const $eq = $.eq(1).addClass('active')
+
+    expect($eq.elements.length).toBe(1)
+    expect($eq.elements[0]).toHaveClass('active')
+    expect($eq.elements[0]).toHaveAttribute('id', 'bar')
+  })
+})
+
 describe('Native Element Methods', () => {
   it('should dynamically call native methods on elements', () => {
     const $ = qe('.selector')
