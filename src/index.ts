@@ -8,6 +8,10 @@ type ExcludeGettersSetters<T> = {
     : never
 }[keyof T]
 
+interface CustomEventInit<T = any> extends EventInit {
+  detail?: T
+}
+
 type NativeElementMethods = Pick<Element, ExcludeGettersSetters<Element>>
 
 /**
@@ -65,7 +69,6 @@ class QeKit {
    * Adds one or more classes to the selected elements.
    *
    * @param classname - The class name(s) to add, separated by spaces.
-   * @returns The QeKit instance for chaining.
    */
   addClass(classname: string) {
     const classes = classname.split(' ')
@@ -79,7 +82,6 @@ class QeKit {
    * Removes one or more classes from the selected elements.
    *
    * @param classname - The class name(s) to remove, separated by spaces.
-   * @returns The QeKit instance for chaining.
    */
   removeClass(classname: string) {
     const classes = classname.split(' ')
@@ -94,7 +96,6 @@ class QeKit {
    *
    * @param classname - The class name(s) to toggle, separated by spaces.
    * @param force - If provided, forces the class to be added or removed based on the boolean value.
-   * @returns The QeKit instance for chaining.
    */
   toggleClass(classname: string, force?: boolean) {
     const classes = classname.split(' ')
@@ -110,7 +111,7 @@ class QeKit {
    * @param classname - The class name to check.
    * @returns True if all elements have the class, false otherwise.
    */
-  hasClass(classname: string): boolean {
+  hasClass(classname: string) {
     return this.elements.every(element => element.classList.contains(classname))
   }
 
@@ -120,8 +121,17 @@ class QeKit {
    * @param type - The event type to listen for.
    * @param listener - The event listener function.
    * @param options - Optional event listener options.
-   * @returns The QeKit instance for chaining.
    */
+  on(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ): this
+  on<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions
+  ): this
   on<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
@@ -139,8 +149,17 @@ class QeKit {
    * @param type - The event type to remove the listener for.
    * @param listener - The event listener function to remove.
    * @param options - Optional event listener options.
-   * @returns The QeKit instance for chaining.
    */
+  off(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ): this
+  off<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions
+  ): this
   off<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
@@ -157,11 +176,15 @@ class QeKit {
    *
    * @param type - The event type to trigger.
    * @param init - Optional event initialization options.
-   * @returns The QeKit instance for chaining.
    */
-  trigger(type: string, init?: EventInit) {
+  trigger<T = any>(type: string | CustomEvent, init?: CustomEventInit<T>) {
     this.elements.forEach(element => {
-      const event = new Event(type, init)
+      let event: Event
+      if (typeof type === 'string') {
+        event = new CustomEvent(type, init)
+      } else {
+        event = type
+      }
       element.dispatchEvent(event)
     })
     return this
@@ -172,8 +195,7 @@ class QeKit {
  * Checks if a property name corresponds to a method on the Element
  * prototype.
  *
- * @param name - The property name to check.
- * @returns True if the property is a method, false otherwise.
+ * @param name - The property name to check
  */
 function isMethod(name: string) {
   const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, name)
@@ -219,7 +241,6 @@ export type QeKitInstance = QeKit & NativeElementMethods
  * @param parent - The parent element or CSS selector string within which to search for the
  *   elements. If not provided, the selector will be applied to the entire
  *   document.
- * @returns A QeKit instance representing the selected elements.
  */
 export default function qe(
   selectors: string | Element | NodeList | HTMLCollection | null,

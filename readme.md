@@ -101,11 +101,16 @@ const handler = event => {
   // do something...
 }
 
-$.on('click', handler) // / handle the click event
-
+$.on('click', handler) // handle the click event
 $.off('click', handler) // removes the event listener
 
-$.trigger('customEvent') // triggers a custom event
+// trigger a custom event with data
+$.trigger('customEvent', { message: 'Hello from custom event!', value: 123 })
+// ... in your event listener ...
+$.on('customEvent', event => {
+  console.log(event.detail.message) // Output: "Hello from custom event!"
+  console.log(event.detail.value) // Output: 123
+})
 ```
 
 ### Native Element methods
@@ -143,7 +148,7 @@ Selects DOM elements based on the provided CSS selectors and returns a `QeKitIns
 - **`hasClass(classname: string): boolean`**: Checks if the class exists on all selected elements.
 - **`on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): QeKitInstance`**: Adds an event listener to each selected element.
 - **`off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): QeKitInstance`**: Removes an event listener from each selected element.
-- **`trigger(type: string, init?: EventInit): QeKitInstance`**: Triggers an event on each selected element.
+- **`trigger<T = any>(type: string | CustomEvent<T>, init?: CustomEventInit<T>): QeKitInstance`**: Triggers an event on each selected element, optionally passing an Event object (e.g., CustomEvent with data).
 - **Native Element Methods**: All native Element methods are available directly on the `QeKitInstance`.
 
 ## Contributing

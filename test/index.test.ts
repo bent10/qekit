@@ -224,6 +224,33 @@ it('should trigger events on elements', () => {
   expect(clickHandler).toHaveBeenCalledTimes(2)
 })
 
+it('should trigger custom events with data using CustomEvent object', () => {
+  const $ = qe('.selector')
+  const eventData = { message: 'Hello from custom event!', value: 123 }
+  const customEvent = new CustomEvent('customEvent', { detail: eventData })
+  const handler = vi.fn()
+
+  $.on('customEvent', handler)
+  $.trigger(customEvent)
+
+  expect(handler).toHaveBeenCalledTimes(2)
+  expect(handler.mock.calls[0][0].detail).toEqual(eventData)
+  expect(handler.mock.calls[1][0].detail).toEqual(eventData)
+})
+
+it('should trigger custom events with data using event name and init object', () => {
+  const $ = qe('.selector')
+  const eventData = { message: 'Hello from custom event!', value: 123 }
+  const handler = vi.fn()
+
+  $.on('customEvent', handler)
+  $.trigger('customEvent', { detail: eventData })
+
+  expect(handler).toHaveBeenCalledTimes(2)
+  expect(handler.mock.calls[0][0].detail).toEqual(eventData)
+  expect(handler.mock.calls[1][0].detail).toEqual(eventData)
+})
+
 it('should allow method chaining', () => {
   const $ = qe('.selector')
   const clickHandler = vi.fn()
