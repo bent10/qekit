@@ -122,23 +122,23 @@ class QeKit {
    * @param listener - The event listener function.
    * @param options - Optional event listener options.
    */
+  on<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions
+  ): this
   on(
     type: string,
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ): this
-  on<K extends keyof HTMLElementEventMap>(
-    type: K,
-    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
-  ): this
-  on<K extends keyof HTMLElementEventMap>(
-    type: K,
-    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+  on(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ) {
     this.elements.forEach(element => {
-      element.addEventListener<K>(type, listener, options)
+      element.addEventListener(type, listener, options)
     })
     return this
   }
@@ -150,23 +150,23 @@ class QeKit {
    * @param listener - The event listener function to remove.
    * @param options - Optional event listener options.
    */
+  off<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions
+  ): this
   off(
     type: string,
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ): this
-  off<K extends keyof HTMLElementEventMap>(
-    type: K,
-    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
-  ): this
-  off<K extends keyof HTMLElementEventMap>(
-    type: K,
-    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+  off(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ) {
     this.elements.forEach(element => {
-      element.removeEventListener<K>(type, listener, options)
+      element.removeEventListener(type, listener, options)
     })
     return this
   }
