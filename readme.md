@@ -131,7 +131,7 @@ Since `v1.3.0`
 `qekit` now lets you chain array methods directly on the returned object, allowing for more fluent operations on the selected elements.
 
 ```js
-$.map(element => parseInt(element.textContent, 10) * 2)
+$.map(el => parseInt(el.textContent, 10) * 2)
 ```
 
 ### Element access by index
@@ -141,19 +141,30 @@ Since `v1.3.0`
 `qekit` allows you to get specific elements from the selection by index using `eq(index)`:
 
 ```js
-const secondItem = qe('.item').eq(1) // gets the second element
-if (secondItem) {
-  secondItem.classList.add('highlight')
-}
+$.eq(1).addClass('active')
+```
+
+### Siblings
+
+Since `v1.3.0`
+
+Select all sibling elements of the selected elements:
+
+```js
+$.eq(1).addClass('.active').siblings().removeClass('.active')
 ```
 
 ### Chaining
 
 ```js
-$.addClass('active').on('click', () => {})
+$.eq(1)
+  .addClass('active')
+  .on('click', () => {
+    // do something with second item
+  })
 
-$.filter(element => element.classList.contains('active')).forEach(
-  element => (element.style.color = 'red')
+$.filter(el => el.classList.contains('active')).forEach(
+  el => (el.style.color = 'red')
 )
 ```
 
@@ -173,6 +184,7 @@ Selects DOM elements based on the provided CSS selectors and returns a `QeKitIns
 - **`off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): QeKitInstance`**: Removes an event listener from each selected element.
 - **`trigger<T = any>(type: string | CustomEvent<T>, init?: CustomEventInit<T>): QeKitInstance`**: Triggers an event on each selected element, optionally passing an Event object (e.g., CustomEvent with data).
 - **`eq(index: number): QeKitInstance`**: Returns the element at the specified index or null if the index is out of bounds.
+- **`siblings(selector?: string): QeKitInstance`**: Returns a new QeKitInstance containing all sibling elements (optionally filtered by a selector).
 - **Native Element Methods**: All native Element methods are available directly on the `QeKitInstance`.
 - **Array Methods**: All standard array methods (`map`, `filter`, `forEach`, `reduce`, `some`, `every`, `find`, `findIndex`) are chainable on the `QeKitInstance`.
 

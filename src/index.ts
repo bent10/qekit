@@ -35,7 +35,7 @@ class QeKit {
    *   document.
    */
   constructor(
-    selectors: string | Element | NodeList | HTMLCollection | null,
+    selectors: string | Element | Element[] | NodeList | HTMLCollection | null,
     parent: Element | Document | string | QeKitInstance | null = document
   ) {
     if (typeof selectors === 'string') {
@@ -60,6 +60,11 @@ class QeKit {
       selectors instanceof HTMLCollection
     ) {
       this.elements = Array.from(selectors) as HTMLElement[]
+    } else if (
+      selectors instanceof Array &&
+      selectors.every(el => el instanceof Element)
+    ) {
+      this.elements = selectors as HTMLElement[]
     } else {
       this.elements = []
     }
@@ -119,11 +124,31 @@ class QeKit {
    * Gets an element at a specific index from the selected elements.
    *
    * @param index - The index of the element to get.
-   * @returns A new QeKit instance containing only the element at the specified index,
-   * or an empty QeKit instance if the index is out of bounds.
    */
-  eq(index: number): QeKitInstance {
+  eq(index: number) {
     return new QeKit(this.elements[index]) as QeKitInstance
+  }
+
+  /**
+   * Gets all sibling elements of the selected elements.
+   *
+   * @param selector - Optional selector string to filter siblings.
+   * @returns A new QeKit instance containing the sibling elements.
+   */
+  siblings(selector?: string): QeKitInstance {
+    const siblings: HTMLElement[] = []
+
+    this.elements.forEach(element => {
+      if (element.parentNode) {
+        Array.from(element.parentNode.children).forEach(child => {
+          if (child !== element && (!selector || child.matches(selector))) {
+            siblings.push(child as HTMLElement)
+          }
+        })
+      }
+    })
+
+    return new QeKit(siblings) as QeKitInstance
   }
 
   /**

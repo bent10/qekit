@@ -295,6 +295,51 @@ describe('eq Method', () => {
   })
 })
 
+describe('siblings Method', () => {
+  it('should return all siblings of the selected elements', () => {
+    const $item = qe('.selector').eq(1)
+    const $siblings = $item.siblings()
+
+    expect($siblings.elements.length).toBe(2)
+    expect($siblings.elements[0]).toHaveTextContent('Foo')
+    expect($siblings.elements[1]).toHaveTextContent('Baz')
+  })
+
+  it('should filter siblings based on a selector', () => {
+    const $item = qe('.selector').eq(1)
+    const $siblings = $item.siblings('div')
+
+    expect($siblings.elements.length).toBe(2)
+    expect($siblings.elements[0]).toHaveTextContent('Foo')
+    expect($siblings.elements[1]).toHaveTextContent('Baz')
+  })
+
+  it('should return an empty QeKit instance if no siblings are found', () => {
+    const $other = qe('.other')
+    const $siblings = $other.siblings()
+
+    expect($siblings.elements.length).toBe(0)
+  })
+
+  it('should return an empty QeKit instance if the element has no parent', () => {
+    const $item = qe('.selector').eq(1)
+    const element = $item.elements[0]
+    element.remove()
+    const $siblings = $item.siblings()
+
+    expect($siblings.elements.length).toBe(0)
+  })
+
+  it('should allow chaining with other methods', () => {
+    const $item = qe('.selector').eq(1)
+    const $siblings = $item.siblings().addClass('highlighted')
+
+    expect($siblings.elements.length).toBe(2)
+    expect($siblings.elements[0]).toHaveClass('highlighted')
+    expect($siblings.elements[1]).toHaveClass('highlighted')
+  })
+})
+
 describe('Native Element Methods', () => {
   it('should dynamically call native methods on elements', () => {
     const $ = qe('.selector')
@@ -331,7 +376,7 @@ describe('Native Element Methods', () => {
   })
 })
 
-describe('Array Method Chaining', () => {
+describe('Array Methods', () => {
   it('should allow chaining map method', () => {
     const doubledValues = qe('.selector').map(
       element => parseInt(element.getAttribute('data-value')!, 10) * 2
