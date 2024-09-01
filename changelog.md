@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/bent10/qekit/compare/v1.2.0...v1.2.1) (2024-09-01)
+
+
+### Bug Fixes
+
+* **types:** correct type definition in some methods ([b4a4e99](https://github.com/bent10/qekit/commit/b4a4e991a349aabf14fc94c81e9c4d98f14ae1fd))
+
 # [1.2.0](https://github.com/bent10/qekit/compare/v1.1.0...v1.2.0) (2024-08-31)
 
 
