@@ -32,16 +32,16 @@ Alternatively, you can also include this module directly in your HTML file from 
   </head>
   <body>
     <div class="container">
-      <div class="foo"><strong>Foo</strong></div>
-      <div class="foo"><em>Bar</em></div>
+      <div class="item"><strong>Foo</strong></div>
+      <div class="item"><em>Bar</em></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/qekit/dist/index.umd.js"></script>
     <script>
       // import qe from 'qekit'
 
-      // selects all elements with the class "foo"
-      const $ = qe('.foo') // qe('.foo', '.container')
+      // selects all elements with the class "item"
+      const $ = qe('.item') // qe('.item', '.container')
 
       // rest of examples...
     </script>
@@ -124,14 +124,24 @@ const value = $.getAttribute('data-id')
 console.log(value)
 ```
 
+### Array methods
+
+Since `v1.3.0`
+
+`qekit` now lets you chain array methods directly on the returned object, allowing for more fluent operations on the selected elements.
+
+```js
+$.map(element => parseInt(element.textContent, 10) * 2)
+```
+
 ### Chaining
 
 ```js
 $.addClass('active').on('click', () => {})
 
-$.elements.forEach(el => {
-  console.log(el.outerHTML)
-})
+$.filter(element => element.classList.contains('active')).forEach(
+  element => (element.style.color = 'red')
+)
 ```
 
 ## API
@@ -150,6 +160,7 @@ Selects DOM elements based on the provided CSS selectors and returns a `QeKitIns
 - **`off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): QeKitInstance`**: Removes an event listener from each selected element.
 - **`trigger<T = any>(type: string | CustomEvent<T>, init?: CustomEventInit<T>): QeKitInstance`**: Triggers an event on each selected element, optionally passing an Event object (e.g., CustomEvent with data).
 - **Native Element Methods**: All native Element methods are available directly on the `QeKitInstance`.
+- **Array Methods**: All standard array methods (`map`, `filter`, `forEach`, `reduce`, `some`, `every`, `find`, `findIndex`) are chainable on the `QeKitInstance`.
 
 ## Contributing
 

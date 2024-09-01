@@ -213,7 +213,7 @@ const elementMethodNames = Object.getOwnPropertyNames(Element.prototype).filter(
   isMethod
 ) as Array<keyof NativeElementMethods>
 
-// Allows using native Element methods directly on QeKit instances.
+// Allows using native Element methods directly on QeKit instances
 elementMethodNames.forEach(method => {
   ;(QeKit as any).prototype[method] = function (...args: any[]) {
     const results = Array.from(this.elements).map(element =>
@@ -228,10 +228,38 @@ elementMethodNames.forEach(method => {
   }
 })
 
+const arrayMethods = [
+  'map',
+  'filter',
+  'forEach',
+  'reduce',
+  'some',
+  'every',
+  'find',
+  'findIndex'
+] as const
+
+// Allows using array methods directly on QeKit instances
+arrayMethods.forEach(method => {
+  ;(QeKit as any).prototype[method] = function (
+    this: QeKit,
+    ...args: Parameters<Array<HTMLElement>[typeof method]>
+  ) {
+    return (this.elements as any)[method](...args)
+  }
+})
+
+type ArrayMethodNames = (typeof arrayMethods)[number]
+
+type ArrayMethods = {
+  [K in ArrayMethodNames]: Array<HTMLElement>[K]
+}
+
 /**
- * A QeKit instance, which extends QeKit with native Element methods.
+ * A QeKit instance, which extends QeKit with native Element methods and
+ * array methods.
  */
-export type QeKitInstance = QeKit & NativeElementMethods
+export type QeKitInstance = QeKit & NativeElementMethods & ArrayMethods
 
 /**
  * Selects DOM elements using a CSS selector and returns a QeKit instance.
