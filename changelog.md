@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/bent10/qekit/compare/v1.2.1...v1.2.2) (2024-09-01)
+
+
+### Bug Fixes
+
+* **types:** correct type definition in `on` and `off` methods ([920e638](https://github.com/bent10/qekit/commit/920e6384a2d4989de84b197b4e40a04f0003b4b5))
+
 ## [1.2.1](https://github.com/bent10/qekit/compare/v1.2.0...v1.2.1) (2024-09-01)
 
 
