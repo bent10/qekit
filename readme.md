@@ -222,8 +222,8 @@ $.filter(el => el.classList.contains('active')).forEach(
 
 Selects DOM elements based on the provided CSS selectors and returns a `QeKitInstance`.
 
-```ts
-qe(
+```js
+qe<T extends Element = HTMLElement>(
   selectors:
     | string
     | Element
@@ -238,7 +238,7 @@ qe(
 
 ### Methods
 
-- **`get(index?: number): HTMLElement | HTMLElement[] | null`**: Gets the selected element(s) at the specified index or the whole collection if index is not provided.
+- **`get(index?: number): T | T[] | null`**: Gets the selected element(s) at the specified index or the whole collection if index is not provided.
 
   - If `index` is provided and within the bounds of the elements, it returns the element at that index.
   - If `index` is not provided, it returns an array containing all the selected elements.

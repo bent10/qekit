@@ -15,15 +15,24 @@ interface CustomEventInit<T = any> extends EventInit {
 type NativeElementMethods = Pick<Element, ExcludeGettersSetters<Element>>
 
 /**
+ * A QeKit instance, which extends QeKit with native Element methods and
+ * array methods.
+ */
+export interface QeKitInstance<T extends Element = HTMLElement>
+  extends QeKit<T>,
+    NativeElementMethods,
+    ArrayMethods {}
+
+/**
  * A utility class for manipulating DOM elements.
  *
  * Provides a chainable API for common DOM operations.
  */
-class QeKit {
+class QeKit<T extends Element = HTMLElement> {
   /**
-   * The array of HTMLElement objects.
+   * The selected Element objects.
    */
-  #elements: HTMLElement[]
+  #elements: T[]
 
   /**
    * Creates a new QeKit instance.
@@ -45,7 +54,7 @@ class QeKit {
       | null,
     parent: Element | Document | string | QeKitInstance | null = document
   ) {
-    this.#elements = []
+    let elements: T[] = []
 
     if (typeof selectors === 'string') {
       let parentElement: Element | Document | null
@@ -61,14 +70,14 @@ class QeKit {
         parentElement = document
       }
 
-      this.#elements = Array.from(parentElement.querySelectorAll(selectors))
+      elements = Array.from(parentElement.querySelectorAll(selectors))
     } else if (selectors instanceof Element) {
-      this.#elements = [selectors as HTMLElement]
+      elements = [selectors as T]
     } else if (
       selectors instanceof NodeList ||
       selectors instanceof HTMLCollection
     ) {
-      this.#elements = Array.from(selectors) as HTMLElement[]
+      elements = Array.from(selectors) as T[]
     } else if (selectors instanceof EventTarget) {
       if (!(selectors instanceof Element)) {
         console.warn('The provided EventTarget selector is not an Element.')
@@ -77,8 +86,10 @@ class QeKit {
       selectors instanceof Array &&
       selectors.every(el => el instanceof Element)
     ) {
-      this.#elements = selectors as HTMLElement[]
+      elements = selectors as T[]
     }
+
+    this.#elements = elements
   }
 
   /**
@@ -93,9 +104,9 @@ class QeKit {
    *
    * @param index The index of the element to get.
    */
-  get(): HTMLElement[]
-  get(index: number): HTMLElement | null
-  get(index?: number): HTMLElement | HTMLElement[] | null {
+  get(): T[]
+  get(index: number): T | null
+  get(index?: number): T | T[] | null {
     if (typeof index === 'number') {
       return this.#elements[index] || null
     } else {
@@ -106,15 +117,15 @@ class QeKit {
   /**
    * Gets the first element in the selected elements.
    */
-  first() {
-    return new QeKit(this.get(0)) as QeKitInstance
+  first(): QeKitInstance<T> {
+    return new QeKit(this.get(0)) as QeKitInstance<T>
   }
 
   /**
    * Gets the last element in the selected elements.
    */
-  last() {
-    return new QeKit(this.get(this.#elements.length - 1)) as QeKitInstance
+  last(): QeKitInstance<T> {
+    return new QeKit(this.get(this.#elements.length - 1)) as QeKitInstance<T>
   }
 
   /**
@@ -122,8 +133,8 @@ class QeKit {
    *
    * @param index - The index of the element to get.
    */
-  eq(index: number) {
-    return new QeKit(this.#elements[index]) as QeKitInstance
+  eq(index: number): QeKitInstance<T> {
+    return new QeKit(this.#elements[index]) as QeKitInstance<T>
   }
 
   /**
@@ -182,7 +193,7 @@ class QeKit {
    *
    * @param selector - Optional selector string to filter siblings.
    */
-  siblings(selector?: string): QeKitInstance {
+  siblings(selector?: string): QeKitInstance<T> {
     const siblings: HTMLElement[] = []
 
     this.#elements.forEach(element => {
@@ -195,7 +206,7 @@ class QeKit {
       }
     })
 
-    return new QeKit(siblings) as QeKitInstance
+    return new QeKit(siblings) as QeKitInstance<T>
   }
 
   /**
@@ -290,11 +301,25 @@ function isMethod(name: string) {
 }
 
 /**
- * An array of names of native Element methods.
+ * A list of native Element method names.
  */
 const elementMethodNames = Object.getOwnPropertyNames(Element.prototype).filter(
   isMethod
 ) as Array<keyof NativeElementMethods>
+
+/**
+ * A list of supported Array method names.
+ */
+const arrayMethods = [
+  'map',
+  'filter',
+  'forEach',
+  'reduce',
+  'some',
+  'every',
+  'find',
+  'findIndex'
+] as const
 
 // Allows using native Element methods directly on QeKit instances
 elementMethodNames.forEach(method => {
@@ -310,17 +335,6 @@ elementMethodNames.forEach(method => {
     return results.length > 1 ? results : results[0]
   }
 })
-
-const arrayMethods = [
-  'map',
-  'filter',
-  'forEach',
-  'reduce',
-  'some',
-  'every',
-  'find',
-  'findIndex'
-] as const
 
 // Allows using array methods directly on QeKit instances
 arrayMethods.forEach(method => {
@@ -339,12 +353,6 @@ type ArrayMethods = {
 }
 
 /**
- * A QeKit instance, which extends QeKit with native Element methods and
- * array methods.
- */
-export type QeKitInstance = QeKit & NativeElementMethods & ArrayMethods
-
-/**
  * Selects DOM elements using a CSS selector and returns a QeKit instance.
  *
  * @param selectors - The CSS selector string, Element(s), NodeList, HTMLCollection or
@@ -353,7 +361,7 @@ export type QeKitInstance = QeKit & NativeElementMethods & ArrayMethods
  *   elements. If not provided, the selector will be applied to the entire
  *   document.
  */
-export default function qe(
+export default function qe<T extends Element = HTMLElement>(
   selectors:
     | string
     | Element
@@ -364,5 +372,5 @@ export default function qe(
     | null,
   parent: Element | Document | string | QeKitInstance | null = document
 ) {
-  return new QeKit(selectors, parent) as QeKitInstance
+  return new QeKit<T>(selectors, parent) as QeKitInstance<T>
 }
