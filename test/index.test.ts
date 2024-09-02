@@ -110,6 +110,20 @@ describe('Selection', () => {
     expect($.elements.length).toBe(1)
     expect($.elements[0].textContent).toBe('Foo')
   })
+
+  it('should log a warning when EventTarget is not an HTMLElement', () => {
+    const originalWarn = console.warn
+    const warnSpy = vi.spyOn(console, 'warn')
+    const eventTarget = new EventTarget()
+
+    qe(eventTarget)
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      'The provided EventTarget is not an HTMLElement.'
+    )
+
+    console.warn = originalWarn
+  })
 })
 
 describe('Event Handling', () => {

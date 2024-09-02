@@ -170,7 +170,7 @@ $.filter(el => el.classList.contains('active')).forEach(
 
 ## API
 
-### `qe(selectors: string | HTMLElement | NodeList | HTMLCollection | null, parent: Element | Document | string | QeKitInstance | null = document): QeKitInstance`
+### `qe(selectors: string | Element | Element[] | NodeList | HTMLCollection | EventTarget | null, parent: Element | Document | string | QeKitInstance | null = document): QeKitInstance`
 
 Selects DOM elements based on the provided CSS selectors and returns a `QeKitInstance`.
 

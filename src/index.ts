@@ -28,16 +28,25 @@ class QeKit {
   /**
    * Creates a new QeKit instance.
    *
-   * @param selectors - The CSS selector string, Element, NodeList, or HTMLCollection to select
-   *   elements.
+   * @param selectors - The CSS selector string, Element(s), NodeList, HTMLCollection or
+   *   EventTarget to select elements.
    * @param parent - The parent element or CSS selector string within which to search for the
    *   elements. If not provided, the selector will be applied to the entire
    *   document.
    */
   constructor(
-    selectors: string | Element | Element[] | NodeList | HTMLCollection | null,
+    selectors:
+      | string
+      | Element
+      | Element[]
+      | NodeList
+      | HTMLCollection
+      | EventTarget
+      | null,
     parent: Element | Document | string | QeKitInstance | null = document
   ) {
+    this.elements = []
+
     if (typeof selectors === 'string') {
       let parentElement: Element | Document | null
       if (typeof parent === 'string') {
@@ -60,13 +69,15 @@ class QeKit {
       selectors instanceof HTMLCollection
     ) {
       this.elements = Array.from(selectors) as HTMLElement[]
+    } else if (selectors instanceof EventTarget) {
+      if (!(selectors instanceof Element)) {
+        console.warn('The provided EventTarget is not an HTMLElement.')
+      }
     } else if (
       selectors instanceof Array &&
       selectors.every(el => el instanceof Element)
     ) {
       this.elements = selectors as HTMLElement[]
-    } else {
-      this.elements = []
     }
   }
 
@@ -300,14 +311,21 @@ export type QeKitInstance = QeKit & NativeElementMethods & ArrayMethods
 /**
  * Selects DOM elements using a CSS selector and returns a QeKit instance.
  *
- * @param selectors - The CSS selector string, Element, NodeList, or HTMLCollection to select
- *   elements.
+ * @param selectors - The CSS selector string, Element(s), NodeList, HTMLCollection or
+ *   EventTarget to select elements.
  * @param parent - The parent element or CSS selector string within which to search for the
  *   elements. If not provided, the selector will be applied to the entire
  *   document.
  */
 export default function qe(
-  selectors: string | Element | NodeList | HTMLCollection | null,
+  selectors:
+    | string
+    | Element
+    | Element[]
+    | NodeList
+    | HTMLCollection
+    | EventTarget
+    | null,
   parent: Element | Document | string | QeKitInstance | null = document
 ) {
   return new QeKit(selectors, parent) as QeKitInstance
