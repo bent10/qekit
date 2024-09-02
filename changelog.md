@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/bent10/qekit/compare/v1.2.2...v1.3.0) (2024-09-02)
+
+
+### Features
+
+* add `eq()` method for accessing elements by index ([ec6b661](https://github.com/bent10/qekit/commit/ec6b6610a325956c6acb53f42b85d5042fdcb747))
+* add `get`, `first`, and `last` methods & make `elements` private ([f64a7bd](https://github.com/bent10/qekit/commit/f64a7bd6e0632219921a5725137237cd70401b80))
+* add `siblings()` method ([d189497](https://github.com/bent10/qekit/commit/d189497e89949e02dd6343e9f7a51858b20a059c))
+* allow `EventTarget` as selector ([8e78cee](https://github.com/bent10/qekit/commit/8e78cee7f83992a160e7058dba43516aa9451e10))
+* enable chaining array methods ([fa89c07](https://github.com/bent10/qekit/commit/fa89c076d44f00cfd270d64a22da33d10e2f58ad))
+* introduce generic type `qe<T>` ([b517100](https://github.com/bent10/qekit/commit/b517100770fd4aaf43c2acbe1e9daf9dec1b3328))
+
 ## [1.2.2](https://github.com/bent10/qekit/compare/v1.2.1...v1.2.2) (2024-09-01)
 
 
