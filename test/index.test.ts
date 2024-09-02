@@ -15,69 +15,69 @@ beforeEach(() => {
 describe('Selection', () => {
   it('should select elements by CSS selector', () => {
     const $ = qe('.selector')
-    expect($.elements.length).toBe(3)
-    expect($.elements[0]).toBeInstanceOf(HTMLElement)
-    expect($.elements[0]).toHaveAttribute('id', 'foo')
-    expect($.elements[1]).toHaveAttribute('id', 'bar')
-    expect($.elements[2]).toHaveAttribute('id', 'baz')
+    expect($.length).toBe(3)
+    expect($.get(0)).toBeInstanceOf(HTMLElement)
+    expect($.get(0)).toHaveAttribute('id', 'foo')
+    expect($.get(1)).toHaveAttribute('id', 'bar')
+    expect($.get(2)).toHaveAttribute('id', 'baz')
   })
 
   it('should handle HTMLElement as selector', () => {
     const fooElement = document.getElementById('foo')
     const $ = qe(fooElement)
-    expect($.elements.length).toBe(1)
-    expect($.elements[0]).toBe(fooElement)
+    expect($.length).toBe(1)
+    expect($.get(0)).toBe(fooElement)
   })
 
   it('should handle NodeList as selector', () => {
     const nodeList = document.querySelectorAll('.selector')
     const $ = qe(nodeList)
-    expect($.elements.length).toBe(3)
-    expect($.elements[0]).toBe(nodeList[0])
-    expect($.elements[1]).toBe(nodeList[1])
-    expect($.elements[2]).toBe(nodeList[2])
+    expect($.length).toBe(3)
+    expect($.get(0)).toBe(nodeList[0])
+    expect($.get(1)).toBe(nodeList[1])
+    expect($.get(2)).toBe(nodeList[2])
   })
 
   it('should handle HTMLCollection as selector', () => {
     const htmlCollection = document.getElementsByClassName('selector')
     const $ = qe(htmlCollection)
-    expect($.elements.length).toBe(3)
-    expect($.elements[0]).toBe(htmlCollection[0])
-    expect($.elements[1]).toBe(htmlCollection[1])
-    expect($.elements[2]).toBe(htmlCollection[2])
+    expect($.length).toBe(3)
+    expect($.get(0)).toBe(htmlCollection[0])
+    expect($.get(1)).toBe(htmlCollection[1])
+    expect($.get(2)).toBe(htmlCollection[2])
   })
 
   it('should select elements within a specific parent', () => {
     const $ = qe('.selector', document.querySelector('#container'))
 
-    expect($.elements.length).toBe(3)
-    expect($.elements[0].textContent).toBe('Foo')
-    expect($.elements[1].textContent).toBe('Bar')
-    expect($.elements[2].textContent).toBe('Baz')
+    expect($.length).toBe(3)
+    expect($.get(0)?.textContent).toBe('Foo')
+    expect($.get(1)?.textContent).toBe('Bar')
+    expect($.get(2)?.textContent).toBe('Baz')
   })
 
   it('should accept a QeKitInstance as the parent', () => {
     const $container = qe('#container')
     const $ = qe('.selector', $container)
 
-    expect($.elements.length).toBe(3)
-    expect($.elements[0].textContent).toBe('Foo')
-    expect($.elements[1].textContent).toBe('Bar')
-    expect($.elements[2].textContent).toBe('Baz')
+    expect($.length).toBe(3)
+    expect($.get(0)?.textContent).toBe('Foo')
+    expect($.get(1)?.textContent).toBe('Bar')
+    expect($.get(2)?.textContent).toBe('Baz')
   })
 
   it('should accept a CSS selector string as the parent', () => {
     const $ = qe('.selector', '#container')
 
-    expect($.elements.length).toBe(3)
-    expect($.elements[0].textContent).toBe('Foo')
-    expect($.elements[1].textContent).toBe('Bar')
-    expect($.elements[2].textContent).toBe('Baz')
+    expect($.length).toBe(3)
+    expect($.get(0)?.textContent).toBe('Foo')
+    expect($.get(1)?.textContent).toBe('Bar')
+    expect($.get(2)?.textContent).toBe('Baz')
   })
 
   it('should handle non-existent elements gracefully', () => {
     const $ = qe('.non-existent')
-    expect($.elements.length).toBe(0)
+    expect($.length).toBe(0)
 
     const clickHandler = vi.fn()
     $.on('click', clickHandler).trigger('click')
@@ -87,7 +87,7 @@ describe('Selection', () => {
 
   it('should handle null selector gracefully', () => {
     const $ = qe(null)
-    expect($.elements.length).toBe(0)
+    expect($.length).toBe(0)
 
     const clickHandler = vi.fn()
     $.on('click', clickHandler).trigger('click')
@@ -98,17 +98,17 @@ describe('Selection', () => {
   it('should handle non-existent parent gracefully', () => {
     const $ = qe('.selector', '.nonexistent')
 
-    expect($.elements.length).toBe(3)
-    expect($.elements[0].textContent).toBe('Foo')
-    expect($.elements[1].textContent).toBe('Bar')
-    expect($.elements[2].textContent).toBe('Baz')
+    expect($.length).toBe(3)
+    expect($.get(0)?.textContent).toBe('Foo')
+    expect($.get(1)?.textContent).toBe('Bar')
+    expect($.get(2)?.textContent).toBe('Baz')
   })
 
   it('should handle multiple parents gracefully', () => {
     const $ = qe('strong', qe('.selector'))
 
-    expect($.elements.length).toBe(1)
-    expect($.elements[0].textContent).toBe('Foo')
+    expect($.length).toBe(1)
+    expect($.get(0)?.textContent).toBe('Foo')
   })
 
   it('should log a warning when EventTarget is not an HTMLElement', () => {
@@ -119,10 +119,253 @@ describe('Selection', () => {
     qe(eventTarget)
 
     expect(warnSpy).toHaveBeenCalledWith(
-      'The provided EventTarget is not an HTMLElement.'
+      'The provided EventTarget selector is not an Element.'
     )
 
     console.warn = originalWarn
+  })
+})
+
+describe('length Method', () => {
+  it('should return the number of selected elements', () => {
+    const $ = qe('.selector')
+    const length = $.length
+
+    expect(length).toBe(3)
+  })
+
+  it('should return 0 if the selection is empty', () => {
+    const $ = qe('.non-existent')
+    const length = $.length
+
+    expect(length).toBe(0)
+  })
+})
+
+describe('get Method', () => {
+  it('should return all elements when no index is provided', () => {
+    const $ = qe('.selector')
+    const elems = $.get()
+
+    expect(elems).toHaveLength(3)
+    expect(elems[0]).toHaveAttribute('id', 'foo')
+    expect(elems[1]).toHaveAttribute('id', 'bar')
+    expect(elems[2]).toHaveAttribute('id', 'baz')
+  })
+
+  it('should return the element at the specified index', () => {
+    const $ = qe('.selector')
+    const elem = $.get(1)
+
+    expect(elem).toHaveAttribute('id', 'bar')
+  })
+
+  it('should return null if the index is out of bounds', () => {
+    const $ = qe('.selector')
+    expect($.get(3)).toBeNull()
+  })
+})
+
+describe('first Method', () => {
+  it('should return a new QeKit instance with the first element', () => {
+    const $ = qe('.selector')
+    const $first = $.first()
+
+    expect($first).toBeInstanceOf($.constructor)
+    expect($first?.length).toBe(1)
+    expect($first?.get(0)).toHaveAttribute('id', 'foo')
+  })
+
+  it('should return an empty QeKitInstance if the selection is empty', () => {
+    const $ = qe('.non-existent')
+    const $first = $.first()
+
+    expect($first).toBeInstanceOf($.constructor)
+    expect($first.length).toBe(0)
+  })
+})
+
+describe('last Method', () => {
+  it('should return a new QeKit instance with the last element', () => {
+    const $ = qe('.selector')
+    const $last = $.last()
+
+    expect($last).toBeInstanceOf($.constructor)
+    expect($last?.length).toBe(1)
+    expect($last?.get(0)).toHaveAttribute('id', 'baz')
+  })
+
+  it('should return an empty QeKitInstance if the selection is empty', () => {
+    const $ = qe('.non-existent')
+    const $last = $.last()
+
+    expect($last).toBeInstanceOf($.constructor)
+    expect($last.length).toBe(0)
+  })
+})
+
+describe('eq Method', () => {
+  it('should return a new QeKit instance with the element at the specified index', () => {
+    const $ = qe('.selector')
+    const $eq = $.eq(1)
+
+    expect($eq).toBeInstanceOf($.constructor)
+    expect($eq.length).toBe(1)
+    expect($eq.get(0)).toHaveAttribute('id', 'bar')
+  })
+
+  it('should return an empty QeKit instance if the index is out of bounds', () => {
+    const $ = qe('.selector')
+    const $eq = $.eq(3)
+
+    expect($eq).toBeInstanceOf($.constructor)
+    expect($eq.length).toBe(0)
+  })
+
+  it('should allow chaining with other methods', () => {
+    const $ = qe('.selector')
+    const $eq = $.eq(1).addClass('active')
+
+    expect($eq.length).toBe(1)
+    expect($eq.get(0)).toHaveClass('active')
+    expect($eq.get(0)).toHaveAttribute('id', 'bar')
+  })
+})
+
+describe('Class Manipulation', () => {
+  it('addClass should add a class to each selected element', () => {
+    const $ = qe('.selector')
+    $.addClass('qux')
+
+    $.forEach(element => {
+      expect(element.classList.contains('qux')).toBe(true)
+    })
+  })
+
+  it('removeClass should remove a class from each selected element', () => {
+    const $ = qe('.selector')
+    $.addClass('qux')
+    $.removeClass('qux')
+
+    $.forEach(element => {
+      expect(element.classList.contains('qux')).toBe(false)
+    })
+  })
+
+  it('toggleClass should toggle a class on each selected element', () => {
+    const $ = qe('.selector')
+    $.toggleClass('qux')
+
+    $.forEach(element => {
+      expect(element.classList.contains('qux')).toBe(true)
+    })
+
+    $.toggleClass('qux')
+
+    $.forEach(element => {
+      expect(element.classList.contains('qux')).toBe(false)
+    })
+  })
+
+  it('addClass should handle multiple classes', () => {
+    const $ = qe('.selector')
+    $.addClass('qux quux')
+
+    $.forEach(element => {
+      expect(element.classList.contains('qux')).toBe(true)
+      expect(element.classList.contains('quux')).toBe(true)
+    })
+  })
+
+  it('removeClass should handle multiple classes', () => {
+    const $ = qe('.selector')
+    $.addClass('qux quux')
+    $.removeClass('qux quux')
+
+    $.forEach(element => {
+      expect(element.classList.contains('qux')).toBe(false)
+      expect(element.classList.contains('quux')).toBe(false)
+    })
+  })
+
+  it('toggleClass should handle multiple classes', () => {
+    const $ = qe('.selector')
+    $.toggleClass('qux quux')
+
+    $.forEach(element => {
+      expect(element.classList.contains('qux')).toBe(true)
+      expect(element.classList.contains('quux')).toBe(true)
+    })
+
+    $.toggleClass('qux quux')
+
+    $.forEach(element => {
+      expect(element.classList.contains('qux')).toBe(false)
+      expect(element.classList.contains('quux')).toBe(false)
+    })
+  })
+
+  it('hasClass should return true if all elements have the class', () => {
+    const $ = qe('.selector')
+    $.addClass('qux')
+    expect($.hasClass('qux')).toBe(true)
+  })
+
+  it('hasClass should return false if any element does not have the class', () => {
+    const $ = qe('.selector')
+    $.addClass('qux')
+    $.eq(0).removeClass('qux')
+
+    expect($.hasClass('qux')).toBe(false)
+  })
+
+  it('hasClass should return false if no elements have the class', () => {
+    const $ = qe('.selector')
+    expect($.hasClass('no-exist')).toBe(false)
+  })
+})
+
+describe('siblings Method', () => {
+  it('should return all siblings of the selected elements', () => {
+    const $item = qe('.selector').eq(1)
+    const $siblings = $item.siblings()
+
+    expect($siblings.length).toBe(2)
+    expect($siblings.get(0)).toHaveTextContent('Foo')
+    expect($siblings.get(1)).toHaveTextContent('Baz')
+  })
+
+  it('should filter siblings based on a selector', () => {
+    const $item = qe('.selector').eq(1)
+    const $siblings = $item.siblings('div')
+
+    expect($siblings.length).toBe(2)
+    expect($siblings.get(0)).toHaveTextContent('Foo')
+    expect($siblings.get(1)).toHaveTextContent('Baz')
+  })
+
+  it('should return an empty QeKit instance if no siblings are found', () => {
+    const $other = qe('.other')
+    const $siblings = $other.siblings()
+
+    expect($siblings.length).toBe(0)
+  })
+
+  it('should return an empty QeKit instance if the element has no parent', () => {
+    const $item = qe('.selector').eq(1)
+    $item.get(0)?.remove()
+
+    const $siblings = $item.siblings()
+    expect($siblings.length).toBe(0)
+  })
+
+  it('should allow chaining with other methods', () => {
+    const $item = qe('.selector').eq(1)
+    const $siblings = $item.siblings().addClass('highlighted')
+
+    expect($siblings.length).toBe(2)
+    expect($siblings.get(0)).toHaveClass('highlighted')
+    expect($siblings.get(1)).toHaveClass('highlighted')
   })
 })
 
@@ -132,7 +375,7 @@ describe('Event Handling', () => {
     const clickHandler = vi.fn()
 
     $.on('click', clickHandler)
-    $.elements[0].dispatchEvent(new Event('click'))
+    $.eq(0).trigger(new CustomEvent('click'))
 
     expect(clickHandler).toHaveBeenCalled()
   })
@@ -143,7 +386,7 @@ describe('Event Handling', () => {
 
     $.on('click', clickHandler)
     $.off('click', clickHandler)
-    $.elements[0].dispatchEvent(new Event('click'))
+    $.eq(0).trigger(new CustomEvent('click'))
 
     expect(clickHandler).not.toHaveBeenCalled()
   })
@@ -188,203 +431,37 @@ describe('Event Handling', () => {
   })
 })
 
-describe('Class Manipulation', () => {
-  it('addClass should add a class to each selected element', () => {
-    const $ = qe('.selector')
-    $.addClass('qux')
-
-    $.elements.forEach(element => {
-      expect(element.classList.contains('qux')).toBe(true)
-    })
-  })
-
-  it('removeClass should remove a class from each selected element', () => {
-    const $ = qe('.selector')
-    $.addClass('qux')
-    $.removeClass('qux')
-
-    $.elements.forEach(element => {
-      expect(element.classList.contains('qux')).toBe(false)
-    })
-  })
-
-  it('toggleClass should toggle a class on each selected element', () => {
-    const $ = qe('.selector')
-    $.toggleClass('qux')
-
-    $.elements.forEach(element => {
-      expect(element.classList.contains('qux')).toBe(true)
-    })
-
-    $.toggleClass('qux')
-
-    $.elements.forEach(element => {
-      expect(element.classList.contains('qux')).toBe(false)
-    })
-  })
-
-  it('addClass should handle multiple classes', () => {
-    const $ = qe('.selector')
-    $.addClass('qux quux')
-
-    $.elements.forEach(element => {
-      expect(element.classList.contains('qux')).toBe(true)
-      expect(element.classList.contains('quux')).toBe(true)
-    })
-  })
-
-  it('removeClass should handle multiple classes', () => {
-    const $ = qe('.selector')
-    $.addClass('qux quux')
-    $.removeClass('qux quux')
-
-    $.elements.forEach(element => {
-      expect(element.classList.contains('qux')).toBe(false)
-      expect(element.classList.contains('quux')).toBe(false)
-    })
-  })
-
-  it('toggleClass should handle multiple classes', () => {
-    const $ = qe('.selector')
-    $.toggleClass('qux quux')
-
-    $.elements.forEach(element => {
-      expect(element.classList.contains('qux')).toBe(true)
-      expect(element.classList.contains('quux')).toBe(true)
-    })
-
-    $.toggleClass('qux quux')
-
-    $.elements.forEach(element => {
-      expect(element.classList.contains('qux')).toBe(false)
-      expect(element.classList.contains('quux')).toBe(false)
-    })
-  })
-
-  it('hasClass should return true if all elements have the class', () => {
-    const $ = qe('.selector')
-    $.addClass('qux')
-    expect($.hasClass('qux')).toBe(true)
-  })
-
-  it('hasClass should return false if any element does not have the class', () => {
-    const $ = qe('.selector')
-    $.addClass('qux')
-    $.elements[0].classList.remove('qux')
-
-    expect($.hasClass('qux')).toBe(false)
-  })
-
-  it('hasClass should return false if no elements have the class', () => {
-    const $ = qe('.selector')
-    expect($.hasClass('no-exist')).toBe(false)
-  })
-})
-
-describe('eq Method', () => {
-  it('should return a new QeKit instance with the element at the specified index', () => {
-    const $ = qe('.selector')
-    const $eq = $.eq(1)
-
-    expect($eq).toBeInstanceOf($.constructor)
-    expect($eq.elements.length).toBe(1)
-    expect($eq.elements[0]).toHaveAttribute('id', 'bar')
-  })
-
-  it('should return an empty QeKit instance if the index is out of bounds', () => {
-    const $ = qe('.selector')
-    const $eq = $.eq(3)
-
-    expect($eq).toBeInstanceOf($.constructor)
-    expect($eq.elements.length).toBe(0)
-  })
-
-  it('should allow chaining with other methods', () => {
-    const $ = qe('.selector')
-    const $eq = $.eq(1).addClass('active')
-
-    expect($eq.elements.length).toBe(1)
-    expect($eq.elements[0]).toHaveClass('active')
-    expect($eq.elements[0]).toHaveAttribute('id', 'bar')
-  })
-})
-
-describe('siblings Method', () => {
-  it('should return all siblings of the selected elements', () => {
-    const $item = qe('.selector').eq(1)
-    const $siblings = $item.siblings()
-
-    expect($siblings.elements.length).toBe(2)
-    expect($siblings.elements[0]).toHaveTextContent('Foo')
-    expect($siblings.elements[1]).toHaveTextContent('Baz')
-  })
-
-  it('should filter siblings based on a selector', () => {
-    const $item = qe('.selector').eq(1)
-    const $siblings = $item.siblings('div')
-
-    expect($siblings.elements.length).toBe(2)
-    expect($siblings.elements[0]).toHaveTextContent('Foo')
-    expect($siblings.elements[1]).toHaveTextContent('Baz')
-  })
-
-  it('should return an empty QeKit instance if no siblings are found', () => {
-    const $other = qe('.other')
-    const $siblings = $other.siblings()
-
-    expect($siblings.elements.length).toBe(0)
-  })
-
-  it('should return an empty QeKit instance if the element has no parent', () => {
-    const $item = qe('.selector').eq(1)
-    const element = $item.elements[0]
-    element.remove()
-    const $siblings = $item.siblings()
-
-    expect($siblings.elements.length).toBe(0)
-  })
-
-  it('should allow chaining with other methods', () => {
-    const $item = qe('.selector').eq(1)
-    const $siblings = $item.siblings().addClass('highlighted')
-
-    expect($siblings.elements.length).toBe(2)
-    expect($siblings.elements[0]).toHaveClass('highlighted')
-    expect($siblings.elements[1]).toHaveClass('highlighted')
-  })
-})
-
 describe('Native Element Methods', () => {
   it('should dynamically call native methods on elements', () => {
     const $ = qe('.selector')
     $.setAttribute('data-test', 'value')
 
-    expect($.elements[0]).toHaveAttribute('data-test', 'value')
-    expect($.elements[1]).toHaveAttribute('data-test', 'value')
-    expect($.elements[2]).toHaveAttribute('data-test', 'value')
+    expect($.get(0)).toHaveAttribute('data-test', 'value')
+    expect($.get(1)).toHaveAttribute('data-test', 'value')
+    expect($.get(2)).toHaveAttribute('data-test', 'value')
 
     const html = qe('.container').querySelector('#foo')?.innerHTML
-    expect(html).toBe($.elements[0].innerHTML)
+    expect(html).toBe($.get(0)?.innerHTML)
   })
 
   it('should get and set attributes using getAttribute and setAttribute', () => {
-    const elements = qe('.selector')
-    elements.setAttribute('data-test', 'value')
+    const $ = qe('.selector')
+    $.setAttribute('data-test', 'value')
 
-    elements.elements.forEach(element => {
+    $.forEach(element => {
       expect(element.getAttribute('data-test')).toBe('value')
     })
 
-    const attrValues = elements.getAttribute('data-test')
+    const attrValues = $.getAttribute('data-test')
     expect(attrValues).toEqual(['value', 'value', 'value'])
   })
 
   it('should remove attributes using removeAttribute', () => {
-    const elements = qe('.selector')
-    elements.setAttribute('data-test', 'value')
-    elements.removeAttribute('data-test')
+    const $ = qe('.selector')
+    $.setAttribute('data-test', 'value')
+    $.removeAttribute('data-test')
 
-    elements.elements.forEach(element => {
+    $.forEach(element => {
       expect(element.hasAttribute('data-test')).toBe(false)
     })
   })

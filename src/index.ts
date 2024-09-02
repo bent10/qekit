@@ -23,7 +23,7 @@ class QeKit {
   /**
    * The array of HTMLElement objects.
    */
-  elements: HTMLElement[]
+  #elements: HTMLElement[]
 
   /**
    * Creates a new QeKit instance.
@@ -45,14 +45,14 @@ class QeKit {
       | null,
     parent: Element | Document | string | QeKitInstance | null = document
   ) {
-    this.elements = []
+    this.#elements = []
 
     if (typeof selectors === 'string') {
       let parentElement: Element | Document | null
       if (typeof parent === 'string') {
         parentElement = document.querySelector(parent)
       } else if (parent instanceof QeKit) {
-        parentElement = parent.elements[0] ?? document
+        parentElement = parent.length ? parent.get(0) : document
       } else {
         parentElement = parent
       }
@@ -61,24 +61,69 @@ class QeKit {
         parentElement = document
       }
 
-      this.elements = Array.from(parentElement.querySelectorAll(selectors))
+      this.#elements = Array.from(parentElement.querySelectorAll(selectors))
     } else if (selectors instanceof Element) {
-      this.elements = [selectors as HTMLElement]
+      this.#elements = [selectors as HTMLElement]
     } else if (
       selectors instanceof NodeList ||
       selectors instanceof HTMLCollection
     ) {
-      this.elements = Array.from(selectors) as HTMLElement[]
+      this.#elements = Array.from(selectors) as HTMLElement[]
     } else if (selectors instanceof EventTarget) {
       if (!(selectors instanceof Element)) {
-        console.warn('The provided EventTarget is not an HTMLElement.')
+        console.warn('The provided EventTarget selector is not an Element.')
       }
     } else if (
       selectors instanceof Array &&
       selectors.every(el => el instanceof Element)
     ) {
-      this.elements = selectors as HTMLElement[]
+      this.#elements = selectors as HTMLElement[]
     }
+  }
+
+  /**
+   * Gets the number of selected elements.
+   */
+  get length() {
+    return this.#elements.length
+  }
+
+  /**
+   * Gets the element at the specified index.
+   *
+   * @param index The index of the element to get.
+   */
+  get(): HTMLElement[]
+  get(index: number): HTMLElement | null
+  get(index?: number): HTMLElement | HTMLElement[] | null {
+    if (typeof index === 'number') {
+      return this.#elements[index] || null
+    } else {
+      return this.#elements
+    }
+  }
+
+  /**
+   * Gets the first element in the selected elements.
+   */
+  first() {
+    return new QeKit(this.get(0)) as QeKitInstance
+  }
+
+  /**
+   * Gets the last element in the selected elements.
+   */
+  last() {
+    return new QeKit(this.get(this.#elements.length - 1)) as QeKitInstance
+  }
+
+  /**
+   * Gets an element at a specific index from the selected elements.
+   *
+   * @param index - The index of the element to get.
+   */
+  eq(index: number) {
+    return new QeKit(this.#elements[index]) as QeKitInstance
   }
 
   /**
@@ -88,7 +133,7 @@ class QeKit {
    */
   addClass(classname: string) {
     const classes = classname.split(' ')
-    this.elements.forEach(element => {
+    this.#elements.forEach(element => {
       element.classList.add(...classes)
     })
     return this
@@ -101,7 +146,7 @@ class QeKit {
    */
   removeClass(classname: string) {
     const classes = classname.split(' ')
-    this.elements.forEach(element => {
+    this.#elements.forEach(element => {
       element.classList.remove(...classes)
     })
     return this
@@ -115,7 +160,7 @@ class QeKit {
    */
   toggleClass(classname: string, force?: boolean) {
     const classes = classname.split(' ')
-    this.elements.forEach(element => {
+    this.#elements.forEach(element => {
       classes.forEach(cls => element.classList.toggle(cls, force))
     })
     return this
@@ -125,31 +170,22 @@ class QeKit {
    * Checks if all selected elements have the specified class.
    *
    * @param classname - The class name to check.
-   * @returns True if all elements have the class, false otherwise.
    */
   hasClass(classname: string) {
-    return this.elements.every(element => element.classList.contains(classname))
-  }
-
-  /**
-   * Gets an element at a specific index from the selected elements.
-   *
-   * @param index - The index of the element to get.
-   */
-  eq(index: number) {
-    return new QeKit(this.elements[index]) as QeKitInstance
+    return this.#elements.every(element =>
+      element.classList.contains(classname)
+    )
   }
 
   /**
    * Gets all sibling elements of the selected elements.
    *
    * @param selector - Optional selector string to filter siblings.
-   * @returns A new QeKit instance containing the sibling elements.
    */
   siblings(selector?: string): QeKitInstance {
     const siblings: HTMLElement[] = []
 
-    this.elements.forEach(element => {
+    this.#elements.forEach(element => {
       if (element.parentNode) {
         Array.from(element.parentNode.children).forEach(child => {
           if (child !== element && (!selector || child.matches(selector))) {
@@ -184,7 +220,7 @@ class QeKit {
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ) {
-    this.elements.forEach(element => {
+    this.#elements.forEach(element => {
       element.addEventListener(type, listener, options)
     })
     return this
@@ -212,7 +248,7 @@ class QeKit {
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ) {
-    this.elements.forEach(element => {
+    this.#elements.forEach(element => {
       element.removeEventListener(type, listener, options)
     })
     return this
@@ -225,7 +261,7 @@ class QeKit {
    * @param init - Optional event initialization options.
    */
   trigger<T = any>(type: string | CustomEvent, init?: CustomEventInit<T>) {
-    this.elements.forEach(element => {
+    this.#elements.forEach(element => {
       let event: Event
       if (typeof type === 'string') {
         event = new CustomEvent(type, init)
@@ -262,8 +298,8 @@ const elementMethodNames = Object.getOwnPropertyNames(Element.prototype).filter(
 
 // Allows using native Element methods directly on QeKit instances
 elementMethodNames.forEach(method => {
-  ;(QeKit as any).prototype[method] = function (...args: any[]) {
-    const results = Array.from(this.elements).map(element =>
+  ;(QeKit as any).prototype[method] = function (this: QeKit, ...args: any[]) {
+    const results = Array.from(this.get()).map(element =>
       (element as any)[method](...args)
     )
 
@@ -292,7 +328,7 @@ arrayMethods.forEach(method => {
     this: QeKit,
     ...args: Parameters<Array<HTMLElement>[typeof method]>
   ) {
-    return (this.elements as any)[method](...args)
+    return (this.get() as any)[method](...args)
   }
 })
 

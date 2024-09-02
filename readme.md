@@ -1,6 +1,22 @@
 # qekit
 
-A lightweight and chainable library for easy DOM manipulation in modern browsers.
+A lightweight (`2.73 kB │ gzip: 1.15 kB`) and chainable library for easy DOM manipulation in modern browsers.
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Contextual selection](#contextual-selection)
+  - [Accessing elements by index and collection](#accessing-elements-by-index-and-collection)
+  - [Class manipulation](#class-manipulation)
+  - [Siblings](#siblings)
+  - [Event handling](#event-handling)
+  - [Native Element methods](#native-element-methods)
+  - [Array methods](#array-methods)
+  - [Chaining](#chaining)
+- [API](#api)
+  - [`qe()`](#qe)
+  - [Methods](#methods)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -65,25 +81,67 @@ Target elements within a specific container or DOM subtree:
 
   ```js
   const container = document.querySelector('#container')
-  const items = qe('.item', container)
+  const $ = qe('.item', container)
   ```
 
 - **QeKitInstance:**
 
   ```js
-  const container = qe('#container')
-  const items = qe('.item', container)
+  const $container = qe('#container')
+  const $ = qe('.item', $container)
   ```
 
 - **CSS selector string:**
 
   ```js
-  const items = qe('.item', '#container')
+  const $ = qe('.item', '#container')
   ```
 
 > [!NOTE]
 >
 > The `parent` parameter is used only when the first argument (`selectors`) is a CSS selector string; otherwise, it is ignored.
+
+### Accessing elements by index and collection
+
+Since `v1.3.0`
+
+`qekit` allows you to easily access elements within a selection:
+
+- **`get(index?)`**: Returns the element(s) at the specified index or all elements if no index is provided.
+
+  ```js
+  const $ = qe('.item')
+
+  // get all elements
+  const elems = $.get()
+  // get the first element
+  const first = $.get(0)
+  // get the third element
+  const third = $.get(2)
+  // try to get a non-existent element
+  const notExist = $.get(10) // returns null
+  ```
+
+- **`first()`**: Returns a new `QeKitInstance` of the first element.
+
+  ```js
+  const $ = qe('.item')
+  const $first = $.first()
+  ```
+
+- **`last()`**: Returns a new `QeKitInstance` of the last element.
+
+  ```js
+  const $ = qe('.item')
+  const $last = $.last()
+  ```
+
+- **`eq(index?)`**: Returns a new `QeKitInstance` with only the element at the specified index.
+
+  ```js
+  const $ = qe('.item')
+  const $third = $.eq(2)
+  ```
 
 ### Class manipulation
 
@@ -92,6 +150,16 @@ $.addClass('bar') // adds the class "bar" to all selected elements
 $.removeClass('bar') // removes the class "bar"
 $.toggleClass('baz') // toggles the class "baz"
 $.hasClass('baz') // returns true if all elements have the class "baz"
+```
+
+### Siblings
+
+Since `v1.3.0`
+
+Select all sibling elements of the selected elements:
+
+```js
+$.eq(1).addClass('.active').siblings().removeClass('.active')
 ```
 
 ### Event handling
@@ -134,26 +202,6 @@ Since `v1.3.0`
 $.map(el => parseInt(el.textContent, 10) * 2)
 ```
 
-### Element access by index
-
-Since `v1.3.0`
-
-`qekit` allows you to get specific elements from the selection by index using `eq(index)`:
-
-```js
-$.eq(1).addClass('active')
-```
-
-### Siblings
-
-Since `v1.3.0`
-
-Select all sibling elements of the selected elements:
-
-```js
-$.eq(1).addClass('.active').siblings().removeClass('.active')
-```
-
 ### Chaining
 
 ```js
@@ -170,21 +218,43 @@ $.filter(el => el.classList.contains('active')).forEach(
 
 ## API
 
-### `qe(selectors: string | Element | Element[] | NodeList | HTMLCollection | EventTarget | null, parent: Element | Document | string | QeKitInstance | null = document): QeKitInstance`
+### `qe()`
 
 Selects DOM elements based on the provided CSS selectors and returns a `QeKitInstance`.
 
-### `QeKitInstance` methods
+```ts
+qe(
+  selectors:
+    | string
+    | Element
+    | Element[]
+    | NodeList
+    | HTMLCollection
+    | EventTarget
+    | null,
+  parent: Element | Document | string | QeKitInstance | null = document
+): QeKitInstance
+```
 
+### Methods
+
+- **`get(index?: number): HTMLElement | HTMLElement[] | null`**: Gets the selected element(s) at the specified index or the whole collection if index is not provided.
+
+  - If `index` is provided and within the bounds of the elements, it returns the element at that index.
+  - If `index` is not provided, it returns an array containing all the selected elements.
+  - If `index` is out of bounds, it returns `null`.
+
+- **`first(): QeKitInstance`**: Gets the first selected element.
+- **`last(): QeKitInstance`**: Gets the last selected element.
+- **`eq(index: number): QeKitInstance`**: Returns the element at the specified index or null if the index is out of bounds.
 - **`addClass(classname: string): QeKitInstance`**: Adds a class or classes to each selected element.
 - **`removeClass(classname: string): QeKitInstance`**: Removes a class or classes from each selected element.
 - **`toggleClass(classname: string): QeKitInstance`**: Toggles a class or classes on each selected element.
 - **`hasClass(classname: string): boolean`**: Checks if the class exists on all selected elements.
+- **`siblings(selector?: string): QeKitInstance`**: Returns a new QeKitInstance containing all sibling elements (optionally filtered by a selector).
 - **`on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): QeKitInstance`**: Adds an event listener to each selected element.
 - **`off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): QeKitInstance`**: Removes an event listener from each selected element.
 - **`trigger<T = any>(type: string | CustomEvent<T>, init?: CustomEventInit<T>): QeKitInstance`**: Triggers an event on each selected element, optionally passing an Event object (e.g., CustomEvent with data).
-- **`eq(index: number): QeKitInstance`**: Returns the element at the specified index or null if the index is out of bounds.
-- **`siblings(selector?: string): QeKitInstance`**: Returns a new QeKitInstance containing all sibling elements (optionally filtered by a selector).
 - **Native Element Methods**: All native Element methods are available directly on the `QeKitInstance`.
 - **Array Methods**: All standard array methods (`map`, `filter`, `forEach`, `reduce`, `some`, `every`, `find`, `findIndex`) are chainable on the `QeKitInstance`.
 
