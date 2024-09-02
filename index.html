@@ -14,10 +14,48 @@
   </head>
 
   <body>
-    <div class="container py-5">
-      <div class="d-flex gap-3">
-        <button class="btn btn-dark">Dark</button>
-        <button class="btn btn-light">Light</button>
+    <div class="container py-5" style="max-width: 600px">
+      <div class="vstack gap-3">
+        <div
+          class="product p-3 border rounded"
+          data-category="electronics"
+          data-price="199.99"
+        >
+          <h2>Smartphone</h2>
+          <p>Model: Alpha 2000</p>
+        </div>
+        <div
+          class="product p-3 border rounded"
+          data-category="furniture"
+          data-price="299.99"
+        >
+          <h2>Office Chair</h2>
+          <p>Color: Black</p>
+        </div>
+        <div
+          class="product p-3 border rounded"
+          data-category="electronics"
+          data-price="149.99"
+        >
+          <h2>Bluetooth Speaker</h2>
+          <p>Model: BeatX</p>
+        </div>
+        <div
+          class="product p-3 border rounded"
+          data-category="clothing"
+          data-price="39.99"
+        >
+          <h2>Jacket</h2>
+          <p>Size: Medium</p>
+        </div>
+        <div
+          class="product p-3 border rounded"
+          data-category="electronics"
+          data-price="99.95"
+        >
+          <h2>Headphones</h2>
+          <p>Type: Over-Ear</p>
+        </div>
       </div>
     </div>
 
@@ -25,18 +63,19 @@
     <script type="module">
       // import qe from "./src/index.ts"
 
-      const $ = qe(".btn")
-
-      $.addClass("foo")
-      console.log('hasClass("foo"):', $.hasClass("foo"))
-
-      $.setAttribute("data-id", "123")
-      console.log("data-id:", $.getAttribute("data-id"))
-
-      $.addClass("active").on("click", e => {
-        e.currentTarget.classList.toggle("active")
-        console.log(e.currentTarget)
-      })
+      qe(".product")
+        .on("click", e => {
+          qe(e.currentTarget)
+            .toggleClass("shadow")
+            .siblings()
+            .removeClass("shadow")
+        })
+        .filter(el => el.dataset.category === "electronics")
+        .forEach(el => {
+          const price = parseFloat(el.dataset.price).toFixed(2)
+          qe(el).addClass("text-bg-primary").get(0).innerHTML +=
+            `<p>Price: $${price}</p>`
+        })
     </script>
   </body>
 </html>

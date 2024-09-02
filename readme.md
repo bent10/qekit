@@ -1,6 +1,6 @@
 # qekit
 
-A lightweight (`2.73 kB │ gzip: 1.15 kB`) and chainable library for easy DOM manipulation in modern browsers.
+A lightweight (`2.7 kB │ gzip: 1.2 kB`) and chainable library for easy DOM manipulation in modern browsers.
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -205,15 +205,24 @@ $.map(el => parseInt(el.textContent, 10) * 2)
 ### Chaining
 
 ```js
-$.eq(1)
-  .addClass('active')
-  .on('click', () => {
-    // do something with second item
+// customize styles
+qe('.item')
+  .filter(el => eq(el).hasClass('active'))
+  .on('click', e => {
+    qe(e.currentTarget).toggleClass('highlighted')
   })
 
-$.filter(el => el.classList.contains('active')).forEach(
-  el => (el.style.color = 'red')
-)
+// interactions & edit contents
+qe('.product')
+  .on('click', e => {
+    qe(e.currentTarget).toggleClass('shadow').siblings().removeClass('shadow')
+  })
+  .filter(el => el.dataset.category === 'electronics')
+  .forEach(el => {
+    const price = parseFloat(el.dataset.price).toFixed(2)
+    qe(el).addClass('text-bg-primary').get(0).innerHTML +=
+      `<p>Price: $${price}</p>`
+  })
 ```
 
 ## API
