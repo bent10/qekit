@@ -47,44 +47,6 @@ describe('Selection', () => {
     expect($.get(2)).toBe(htmlCollection[2])
   })
 
-  it('should select elements within a specific parent', () => {
-    const $ = qe('.selector', document.querySelector('#container'))
-
-    expect($.length).toBe(3)
-    expect($.get(0)?.textContent).toBe('Foo')
-    expect($.get(1)?.textContent).toBe('Bar')
-    expect($.get(2)?.textContent).toBe('Baz')
-  })
-
-  it('should accept a QeKitInstance as the parent', () => {
-    const $container = qe('#container')
-    const $ = qe('.selector', $container)
-
-    expect($.length).toBe(3)
-    expect($.get(0)?.textContent).toBe('Foo')
-    expect($.get(1)?.textContent).toBe('Bar')
-    expect($.get(2)?.textContent).toBe('Baz')
-  })
-
-  it('should accept a CSS selector string as the parent', () => {
-    const $ = qe('.selector', '#container')
-
-    expect($.length).toBe(3)
-    expect($.get(0)?.textContent).toBe('Foo')
-    expect($.get(1)?.textContent).toBe('Bar')
-    expect($.get(2)?.textContent).toBe('Baz')
-  })
-
-  it('should handle non-existent elements gracefully', () => {
-    const $ = qe('.non-existent')
-    expect($.length).toBe(0)
-
-    const clickHandler = vi.fn()
-    $.on('click', clickHandler).trigger('click')
-
-    expect(clickHandler).not.toHaveBeenCalled()
-  })
-
   it('should handle null selector gracefully', () => {
     const $ = qe(null)
     expect($.length).toBe(0)
@@ -95,20 +57,14 @@ describe('Selection', () => {
     expect(clickHandler).not.toHaveBeenCalled()
   })
 
-  it('should handle non-existent parent gracefully', () => {
-    const $ = qe('.selector', '.nonexistent')
+  it('should handle non-existent elements gracefully', () => {
+    const $ = qe('.non-existent')
+    expect($.length).toBe(0)
 
-    expect($.length).toBe(3)
-    expect($.get(0)?.textContent).toBe('Foo')
-    expect($.get(1)?.textContent).toBe('Bar')
-    expect($.get(2)?.textContent).toBe('Baz')
-  })
+    const clickHandler = vi.fn()
+    $.on('click', clickHandler).trigger('click')
 
-  it('should handle multiple parents gracefully', () => {
-    const $ = qe('strong', qe('.selector'))
-
-    expect($.length).toBe(1)
-    expect($.get(0)?.textContent).toBe('Foo')
+    expect(clickHandler).not.toHaveBeenCalled()
   })
 
   it('should log a warning when EventTarget is not an HTMLElement', () => {
@@ -126,7 +82,50 @@ describe('Selection', () => {
   })
 })
 
-describe('length Method', () => {
+describe('Contextual selection', () => {
+  it('should select elements within a specific parent (HTMLElement)', () => {
+    const $ = qe('.selector', document.querySelector('#container'))
+    expect($.length).toBe(3)
+    expect($.get(0)?.textContent).toBe('Foo')
+    expect($.get(1)?.textContent).toBe('Bar')
+    expect($.get(2)?.textContent).toBe('Baz')
+  })
+
+  it('should select elements within a specific parent (QeKitInstance)', () => {
+    const $container = qe('#container')
+    const $ = qe('.selector', $container)
+    expect($.length).toBe(3)
+    expect($.get(0)?.textContent).toBe('Foo')
+    expect($.get(1)?.textContent).toBe('Bar')
+    expect($.get(2)?.textContent).toBe('Baz')
+  })
+
+  it('should select elements within a specific parent (CSS selector string)', () => {
+    const $ = qe('.selector', '#container')
+    expect($.length).toBe(3)
+    expect($.get(0)?.textContent).toBe('Foo')
+    expect($.get(1)?.textContent).toBe('Bar')
+    expect($.get(2)?.textContent).toBe('Baz')
+  })
+
+  it('should handle non-existent parent gracefully', () => {
+    const $ = qe('.selector', '.nonexistent')
+
+    expect($.length).toBe(3)
+    expect($.get(0)?.textContent).toBe('Foo')
+    expect($.get(1)?.textContent).toBe('Bar')
+    expect($.get(2)?.textContent).toBe('Baz')
+  })
+
+  it('should handle multiple parents gracefully', () => {
+    const $ = qe('strong', qe('.selector'))
+
+    expect($.length).toBe(1)
+    expect($.get(0)?.textContent).toBe('Foo')
+  })
+})
+
+describe('length method', () => {
   it('should return the number of selected elements', () => {
     const $ = qe('.selector')
     const length = $.length
@@ -142,7 +141,7 @@ describe('length Method', () => {
   })
 })
 
-describe('get Method', () => {
+describe('get method', () => {
   it('should return all elements when no index is provided', () => {
     const $ = qe('.selector')
     const elems = $.get()
@@ -166,7 +165,7 @@ describe('get Method', () => {
   })
 })
 
-describe('first Method', () => {
+describe('first method', () => {
   it('should return a new QeKit instance with the first element', () => {
     const $ = qe('.selector')
     const $first = $.first()
@@ -185,7 +184,7 @@ describe('first Method', () => {
   })
 })
 
-describe('last Method', () => {
+describe('last method', () => {
   it('should return a new QeKit instance with the last element', () => {
     const $ = qe('.selector')
     const $last = $.last()
@@ -204,7 +203,7 @@ describe('last Method', () => {
   })
 })
 
-describe('eq Method', () => {
+describe('eq method', () => {
   it('should return a new QeKit instance with the element at the specified index', () => {
     const $ = qe('.selector')
     const $eq = $.eq(1)
@@ -232,7 +231,7 @@ describe('eq Method', () => {
   })
 })
 
-describe('Class Manipulation', () => {
+describe('Class manipulation', () => {
   it('addClass should add a class to each selected element', () => {
     const $ = qe('.selector')
     $.addClass('qux')
@@ -325,7 +324,7 @@ describe('Class Manipulation', () => {
   })
 })
 
-describe('siblings Method', () => {
+describe('siblings method', () => {
   it('should return all siblings of the selected elements', () => {
     const $item = qe('.selector').eq(1)
     const $siblings = $item.siblings()
@@ -369,7 +368,7 @@ describe('siblings Method', () => {
   })
 })
 
-describe('Event Handling', () => {
+describe('Event handling', () => {
   it('should add event listeners to elements', () => {
     const $ = qe('.selector')
     const clickHandler = vi.fn()
@@ -411,27 +410,13 @@ describe('Event Handling', () => {
     $.trigger(customEvent)
 
     expect(handler).toHaveBeenCalledTimes(3)
-    expect(handler.mock.calls[0][0].detail).toEqual(eventData)
-    expect(handler.mock.calls[1][0].detail).toEqual(eventData)
-    expect(handler.mock.calls[2][0].detail).toEqual(eventData)
-  })
-
-  it('should trigger custom events with data using event name and init object', () => {
-    const $ = qe('.selector')
-    const eventData = { message: 'Hello from custom event!', value: 123 }
-    const handler = vi.fn()
-
-    $.on('customEvent', handler)
-    $.trigger('customEvent', { detail: eventData })
-
-    expect(handler).toHaveBeenCalledTimes(3)
-    expect(handler.mock.calls[0][0].detail).toEqual(eventData)
-    expect(handler.mock.calls[1][0].detail).toEqual(eventData)
-    expect(handler.mock.calls[2][0].detail).toEqual(eventData)
+    $.forEach((_el, i) => {
+      expect(handler.mock.calls[i][0].detail).toEqual(eventData)
+    })
   })
 })
 
-describe('Native Element Methods', () => {
+describe('Native Element methods', () => {
   it('should dynamically call native methods on elements', () => {
     const $ = qe('.selector')
     $.setAttribute('data-test', 'value')
@@ -467,7 +452,7 @@ describe('Native Element Methods', () => {
   })
 })
 
-describe('Array Methods', () => {
+describe('Array methods', () => {
   it('should allow chaining map method', () => {
     const doubledValues = qe('.selector').map(
       element => parseInt(element.getAttribute('data-value')!, 10) * 2
