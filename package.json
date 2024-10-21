@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.6.2",
-    "doogu": "4.1.0",
+    "doogu": "4.1.1",
     "jsdom": "25.0.1",
     "vite-plugin-resolve-umd-format": "1.0.0"
   },
